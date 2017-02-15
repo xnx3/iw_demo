@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
+                        "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+<taglib>
+ <tlib-version>1.0</tlib-version>
+ <jsp-version>1.2</jsp-version>
+ <short-name>xnx3_library</short-name>
+ <uri>http://www.xnx3.com/java_xnx3/xnx3_tld</uri>
+ <tag>
+ 	<name>time</name>
+ 	<tag-class>com.xnx3.j2ee.tld.TimeTag</tag-class>
+ 	<body-content>jsp</body-content>
+ 	<attribute>
+ 		<name>linuxTime</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>Linux时间戳，10位或者13位</description>
+ 	</attribute>
+ 	<attribute>
+ 		<name>format</name>
+ 		<required>false</required>
+ 		<description>转换格式 ,若不填，默认为yyyy-MM-dd hh:mm:ss</description>
+ 	</attribute>
+ </tag>
+ 
+ <tag>
+ 	<name>language</name>
+ 	<tag-class>com.xnx3.j2ee.tld.Language</tag-class>
+ 	<body-content>jsp</body-content>
+ 	<attribute>
+ 		<name>key</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>language.xml中语言下的节点名字，如 user_loginSuccess</description>
+ 	</attribute>
+ 	<attribute>
+ 		<name>remark</name>
+ 		<required>false</required>
+ 		<description>备注，程序中无任何作用，只是给开发人员自己看</description>
+ 	</attribute>
+ </tag>
+ 
+ <tag>
+ 	<name>imgUrl</name>
+ 	<tag-class>com.xnx3.j2ee.tld.ImgUrl</tag-class>
+ 	<body-content>jsp</body-content>
+ 	<attribute>
+ 		<name>prefixUrl</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>如果图片路径img是一个相对路径，则加入此作为网址前缀，拼接为绝对路径</description>
+ 	</attribute>
+ 	<attribute>
+ 		<name>img</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>图片路径，可传入相对路径与绝对路径</description>
+ 	</attribute>
+ </tag>
+ 
+ <tag>
+ 	<name>substring</name>
+ 	<tag-class>com.xnx3.j2ee.tld.SubString</tag-class>
+ 	<body-content>jsp</body-content>
+ 	<attribute>
+ 		<name>text</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>原字符串，要剪裁的字符串</description>
+ 	</attribute>
+ 	<attribute>
+ 		<name>maxLength</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>字符串显示的最大长度（汉字或英文）</description>
+ 	</attribute>
+ 	<attribute>
+ 		<name>more</name>
+ 		<required>false</required>
+ 		<description>若超过最大长度，裁减的字符串会加上此输出。若不填默认使用 ...</description>
+ 	</attribute>
+ </tag>
+ 
+ <tag>
+ 	<name>fileSizeToInfo</name>
+ 	<tag-class>com.xnx3.j2ee.tld.FileSizeToInfo</tag-class>
+ 	<body-content>jsp</body-content>
+ 	<attribute>
+ 		<name>size</name>
+ 		<required>true</required>
+ 		<rtexprvalue>true</rtexprvalue>
+ 		<description>以b为单位的long类型，会自动转为KB、MB、GB的描述形式</description>
+ 	</attribute>
+ </tag>
+ 
+</taglib>

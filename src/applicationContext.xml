@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<!-- 注解 -->
+	<context:component-scan base-package="com.xnx3.j2ee">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+<!-- 	<context:component-scan base-package="com.iworkware">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan> -->
+	
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+
+	<!-- 配置数据源 -->
+	<context:property-placeholder location="classpath:db.properties" />
+	
+	<!-- 事务注解扫描相关，再Dao类的上方加@Transactional，便可以自动提交事务 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.xnx3.j2ee.dao" />
+<!--     <context:component-scan base-package="com.iworkware.dao" /> -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!-- 配置DataSource -->
+	<bean class="com.mchange.v2.c3p0.ComboPooledDataSource" id="dataSource">
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.passowrd}"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+		
+		<!-- 初始化时获取连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+		<property name="initialPoolSize" value="2"></property>  
+		<!-- 连接池中保留的最小连接数，默认为：3 -->
+	    <property name="minPoolSize" value="2"></property>  
+	    <!-- 连接池中保留的最大连接数。默认值: 15 -->
+	    <property name="maxPoolSize" value="20"></property> 
+	    <!-- 最大空闲时间，多少秒内未使用则连接被丢弃。若为0则永不丢弃。默认值: 0 --> 
+	    <property name="maxIdleTime" value="60"></property>  
+	    <!-- 每隔多少秒检查所有连接池中的空闲连接。Default: 0  -->
+		<property name="idleConnectionTestPeriod" value="60"></property>
+	</bean>
+
+	
+	<!-- 配置SessionFactory -->
+	<bean class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		id="sessionFactory">
+		<!-- 配置数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 扫描的实体包(pojo) -->
+		<property name="namingStrategy">
+			<bean class="org.hibernate.cfg.ImprovedNamingStrategy"></bean>
+		</property>
+		<property name="packagesToScan">
+            <list>
+                <!-- 可以加多个包 -->
+                <value>com.xnx3.j2ee.entity</value>
+				<!-- <value>com.iworkware.entity</value> -->
+            </list>
+        </property>
+
+		<!-- 配置Hibernate 的常用属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 数据库的方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="connection.autocommit">true</prop>
+				<prop key="hibernate.autoReconnect">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 配置Hibernate 的事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+      <property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+    <!-- 支持上传文件 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" >
+    	<property name="defaultEncoding" value="UTF-8"></property>
+    	<!-- 上传文件限制的最大尺寸 -->
+    	<property name="maxUploadSize" value="1024000"></property>
+    </bean>
+    
+	<bean id="UserDAO" class="com.xnx3.j2ee.dao.UserDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="FriendDAO" class="com.xnx3.j2ee.dao.FriendDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="PostDataDAO" class="com.xnx3.j2ee.dao.PostDataDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="PostClassDAO" class="com.xnx3.j2ee.dao.PostClassDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="PostCommentDAO"
+		class="com.xnx3.j2ee.dao.PostCommentDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="MessageDataDAO"
+		class="com.xnx3.j2ee.dao.MessageDataDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="MessageDAO" class="com.xnx3.j2ee.dao.MessageDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="PostDAO" class="com.xnx3.j2ee.dao.PostDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="FriendLogDAO" class="com.xnx3.j2ee.dao.FriendLogDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="UserRoleDAO" class="com.xnx3.j2ee.dao.UserRoleDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="RoleDAO" class="com.xnx3.j2ee.dao.RoleDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="PermissionDAO" class="com.xnx3.j2ee.dao.PermissionDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="RolePermissionDAO" class="com.xnx3.j2ee.dao.RolePermissionDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="SystemDAO" class="com.xnx3.j2ee.dao.SystemDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="SqlDAO" class="com.xnx3.j2ee.dao.SqlDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="LogDAO" class="com.xnx3.j2ee.dao.LogDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+		<bean id="AreaDAO" class="com.xnx3.j2ee.dao.AreaDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="SmsLogDAO" class="com.xnx3.j2ee.dao.SmsLogDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="PayLogDAO"
+		class="com.xnx3.j2ee.dao.PayLogDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="CollectDAO"
+		class="com.xnx3.j2ee.dao.CollectDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<!-- <bean id="ProjectDAO" class="com.iworkware.dao.ProjectDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean> -->
+	
+	<!-- Spring -->
+	<bean id="userService" class="com.xnx3.j2ee.service.impl.UserServiceImpl">
+		<property name="userDao"><ref bean="UserDAO" /></property>
+		<property name="logDao"><ref bean="LogDAO" /></property>
+		<property name="userRoleDAO"><ref bean="UserRoleDAO" /></property>
+		<property name="smsLogDAO"><ref bean="SmsLogDAO" /></property>
+	</bean>
+	<bean id="userRoleService" class="com.xnx3.j2ee.service.impl.UserRoleServiceImpl">
+		<property name="userDao"><ref bean="UserDAO" /></property>
+		<property name="userRoleDao"><ref bean="UserRoleDAO" /></property>
+		<property name="permissionDAO"><ref bean="PermissionDAO" /></property>
+	</bean>
+	<bean id="systemService" class="com.xnx3.j2ee.service.impl.SystemServiceImpl">
+		<property name="systemDao"><ref bean="SystemDAO" /></property>
+	</bean>
+	<bean id="smsLogService" class="com.xnx3.j2ee.service.impl.SmsLogServiceImpl">
+		<property name="smsLogDAO"><ref bean="SmsLogDAO" /></property>
+	</bean>
+	<bean id="roleService" class="com.xnx3.j2ee.service.impl.RoleServiceImpl">
+		<property name="roleDao"><ref bean="RoleDAO" /></property>
+	</bean>
+	<bean id="rolePermissionService" class="com.xnx3.j2ee.service.impl.RolePermissionServiceImpl">
+		<property name="rolePermissionDAO"><ref bean="RolePermissionDAO" /></property>
+	</bean>
+	<bean id="postService" class="com.xnx3.j2ee.service.impl.PostServiceImpl">
+		<property name="postDAO"><ref bean="PostDAO" /></property>
+		<property name="postDataDAO"><ref bean="PostDataDAO" /></property>
+		<property name="logDAO"><ref bean="LogDAO" /></property>
+		<property name="userDAO"><ref bean="UserDAO" /></property>
+		<property name="postClassDAO"><ref bean="PostClassDAO" /></property>
+		<property name="postCommentDAO"><ref bean="PostCommentDAO" /></property>
+	</bean>
+	<bean id="postDataService" class="com.xnx3.j2ee.service.impl.PostDataServiceImpl">
+		<property name="postDataDAO"><ref bean="PostDataDAO" /></property>
+	</bean>
+	<bean id="postCommentService" class="com.xnx3.j2ee.service.impl.PostCommentServiceImpl">
+		<property name="postCommentDAO"><ref bean="PostCommentDAO" /></property>
+		<property name="logDAO"><ref bean="LogDAO" /></property>
+		<property name="postDAO"><ref bean="PostDAO" /></property>
+	</bean>
+	<bean id="postClassService" class="com.xnx3.j2ee.service.impl.PostClassServiceImpl">
+		<property name="postClassDAO"><ref bean="PostClassDAO" /></property>
+		<property name="logDAO"><ref bean="LogDAO" /></property>
+	</bean>
+	<bean id="permissionService" class="com.xnx3.j2ee.service.impl.PermissionServiceImpl">
+		<property name="permissionDAO"><ref bean="PermissionDAO" /></property>
+	</bean>
+	<bean id="payLogService" class="com.xnx3.j2ee.service.impl.PayLogServiceImpl">
+		<property name="payLogDAO"><ref bean="PayLogDAO" /></property>
+	</bean>
+	<bean id="messageService" class="com.xnx3.j2ee.service.impl.MessageServiceImpl">
+		<property name="messageDao"><ref bean="MessageDAO" /></property>
+		<property name="messageDataDao"><ref bean="MessageDataDAO" /></property>
+		<property name="logDao"><ref bean="LogDAO" /></property>
+		<property name="userDao"><ref bean="UserDAO" /></property>
+	</bean>
+	<bean id="messageDataService" class="com.xnx3.j2ee.service.impl.MessageDataServiceImpl">
+		<property name="messageDataDAO"><ref bean="MessageDataDAO" /></property>
+	</bean>
+	<bean id="logService" class="com.xnx3.j2ee.service.impl.LogServiceImpl">
+		<property name="logDAO"><ref bean="LogDAO" /></property>
+	</bean>
+	<bean id="sqlService" class="com.xnx3.j2ee.service.impl.SqlServiceImpl">
+		<property name="sqlDAO"><ref bean="SqlDAO" /></property>
+	</bean>
+	<bean id="friendService" class="com.xnx3.j2ee.service.impl.FriendServiceImpl">
+		<property name="friendDAO"><ref bean="FriendDAO" /></property>
+	</bean>
+	<bean id="friendLogService" class="com.xnx3.j2ee.service.impl.FriendLogServiceImpl">
+		<property name="friendLogDAO"><ref bean="FriendLogDAO" /></property>
+	</bean>
+	<bean id="areaService" class="com.xnx3.j2ee.service.impl.AreaServiceImpl">
+		<property name="areaDAO"><ref bean="AreaDAO" /></property>
+	</bean>
+	<bean id="collectService" class="com.xnx3.j2ee.service.impl.CollectServiceImpl">
+		<property name="collectDAO"><ref bean="CollectDAO" /></property>
+		<property name="logDAO"><ref bean="LogDAO" /></property>
+		<property name="userDAO"><ref bean="UserDAO" /></property>
+	</bean>
+	<bean id="ossService" class="com.xnx3.j2ee.service.impl.OSSServiceImpl">
+	</bean>
+	<bean id="languageService" class="com.xnx3.j2ee.service.impl.LanguageServiceImpl">
+	</bean>
+	<bean id="QRCodeService" class="com.xnx3.j2ee.service.impl.QRCodeServiceImpl">
+	</bean>
+	<bean id="TxtFilterService" class="com.xnx3.j2ee.service.impl.TxtFilterServiceImpl">
+	</bean>
+	<bean id="CaptchaService" class="com.xnx3.j2ee.service.impl.CaptchaServiceImpl">
+	</bean>
+</beans>
