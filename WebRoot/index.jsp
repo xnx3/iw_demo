@@ -13,11 +13,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 </head>
 <body>
 	<h1 style="text-align: center;">iw快速开发框架</h1>
-	<p>src/com/xnx3/j2ee/ ：iw本身的控制器(controller)、实体类(entity)、以及系统级操作(system)</p>
-	<p>WebRoot/WEB-INF/lib ：iw开发所依赖的类库，已集成好</p>
-	<p>WebRoot/WEB-INF/view ：Spring MVC 的 view 层显示，其中，其内的 iw文件夹下为iw本身自带功能的前端展示；publicPage 文件夹下为公共的模版，比如公共头部、尾部、提示页面</p>
-	<p></p>
-	<p></p>
-	
+	<div>
+		<a href="login.do" target="_black">登陆</a>
+		&nbsp; 初始账号：admin &nbsp;&nbsp; 密码admin
+	</div>
+	<div>GitHub &nbsp;
+		<a href="https://github.com/xnx3/iw" target="_black"> iw 使用说明</a> &nbsp;
+		<a href="https://github.com/xnx3/iw_demo" target="_black"> iw_demo</a>
+	</div>
+	<div>
+		<img src="http://www.xnx3.com/d/file/software/iw/20170215/6daab4364cda11b1a44d103c00110e28.jpg" style="width:100%;" />
+	</div>
 </body>
 </html>
